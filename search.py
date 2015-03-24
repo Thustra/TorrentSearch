@@ -12,7 +12,9 @@ base_url = 'http://www.extratorrent.cc/'
 user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
 headers = {'User-Agent': user_agent}
 
-main_menu = menu.Menu('Main',['Download an episode','Update one or more series','Exit'])
+
+def some_func():
+    None
 
 
 def print_menu(menu_options):
@@ -23,9 +25,20 @@ def print_menu(menu_options):
 
     resolve_choice(menu_options, choice)
 
+
 def resolve_choice(options,choice):
     if options is main_menu:
         print(main_menu[choice])
+
+
+def generate_series_list():
+        dirlist = scan.scan_all('Z:\Series\\')
+        dirlist.sort()
+        i = 1
+        for dir in dirlist:
+            print(str(i) + '. ' + dir)
+            i += 1
+
 
 def options_menu():
     option = input(
@@ -52,6 +65,7 @@ def search_show(show):
     htmlpage = response.read()
     return htmlpage
 
+
 def extract_links(page):
     soup = BeautifulSoup(page)
     torrentrows = soup.find_all(class_= re.compile('tl[rz]'))
@@ -69,8 +83,8 @@ def extract_links(page):
         #
 
         try:
-            seeders = int(row.find('td', {'class' : 'sy'} ).string)
-            leechers = int(row.find('td', {'class' : 'ly'} ).string)
+            seeders = int(row.find('td', {'class': 'sy'} ).string)
+            leechers = int(row.find('td', {'class': 'ly'} ).string)
 
             # Create a tuple with link, seeders, leechers
 
@@ -83,16 +97,25 @@ def extract_links(page):
 
     return links
 
+
 def download_torrent(link,show):
     print(link)
     req = urllib.request.Request(link,headers=headers)
     response = urllib.request.urlopen(req)
     f = open('torrents\\'+show+'.torrent', 'wb')
     torrent_file = response.read(1024)
-    while(torrent_file):
+    while torrent_file:
         f.write(torrent_file)
         torrent_file = response.read(1024)
 
+some_menu = menu.Menu()
+
+main_menu = menu.Menu('Main',
+                      [
+                          ('Download an episode', some_func()),
+                          ('Update one or more series', generate_series_list()),
+                          ('Exit', some_func())
+                      ])
 
 def main():
     print(main_menu)
