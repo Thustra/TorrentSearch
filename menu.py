@@ -1,5 +1,6 @@
 __author__ = 'Peter'
 
+
 class Menu:
 
     def __init__(self, label, options):

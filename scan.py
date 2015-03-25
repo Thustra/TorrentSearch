@@ -7,8 +7,10 @@ from os.path import isdir
 # Scans a directory
 #
 
+
 def scan_directory(dir):
     None
+
 
 def scan_all(path):
     result = listdir(path)
