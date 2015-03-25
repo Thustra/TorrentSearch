@@ -108,7 +108,6 @@ def download_torrent(link,show):
         f.write(torrent_file)
         torrent_file = response.read(1024)
 
-some_menu = menu.Menu()
 
 main_menu = menu.Menu('Main',
                       [
@@ -119,7 +118,6 @@ main_menu = menu.Menu('Main',
 
 def main():
     print(main_menu)
-  #  print_menu(main_menu)
     show = input('Which show?')
     print('Searching for ' + show)
     result = search_show(show)
