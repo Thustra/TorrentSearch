@@ -108,8 +108,6 @@ def download_torrent(link,show):
         f.write(torrent_file)
         torrent_file = response.read(1024)
 
-some_menu = menu.Menu()
-
 main_menu = menu.Menu('Main',
                       [
                           ('Download an episode', some_func()),
