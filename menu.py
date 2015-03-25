@@ -9,7 +9,10 @@ class Menu:
 
     def __repr__(self):
 
-        option_list = '\n'.join([str(self.options.index(option) + 1) + '. ' + option for option in self.options])
+        option_list = '\n'.join([str(self.options.index(option) + 1) + '. ' + option[0] for option in self.options])
 
-        result_string = '{} \n=====================\n'.format(self.label)
-        return result_string + option_list
+        label_string = '{} \n=====================\n'.format(self.label)
+        return label_string + option_list
+
+    def evaluate(self, choice):
+        None
