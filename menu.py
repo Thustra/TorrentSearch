@@ -1,5 +1,7 @@
 __author__ = 'Peter'
 
+#import search
+
 
 class Menu:
 
@@ -15,4 +17,10 @@ class Menu:
         return label_string + option_list
 
     def evaluate(self, choice):
-        None
+        if isinstance(self.options[int(choice) - 1][1],Menu):
+            print('this is a menu')
+            #print(self.options[int(choice) - 1][1])
+            #search.set_current_menu(self.options[int(choice) - 1][1])
+        else:
+            print('This is a function')
+            self.options[int(choice) - 1][1]()

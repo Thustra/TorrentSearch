@@ -1,7 +1,7 @@
 import urllib.request
 import urllib.parse
 import re
-import collections
+import sys
 from bs4 import BeautifulSoup
 
 import scan, menu
@@ -12,46 +12,16 @@ base_url = 'http://www.extratorrent.cc/'
 user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
 headers = {'User-Agent': user_agent}
 
+current_menu = None
 
-def some_func():
-    None
-
-
-def print_menu(menu_options):
-    for key,item in menu_options.items():
-        print(key+ ': ' + item)
-
-    choice = input('>> ')
-
-    resolve_choice(menu_options, choice)
-
-
-def resolve_choice(options,choice):
-    if options is main_menu:
-        print(main_menu[choice])
+def exit_func():
+    sys.exit()
 
 
 def generate_series_list():
         dirlist = scan.scan_all('Z:\Series\\')
         dirlist.sort()
         i = 1
-        for dir in dirlist:
-            print(str(i) + '. ' + dir)
-            i += 1
-
-
-def options_menu():
-    option = input(
-        'What do you want to do? \n'
-        '1 - Download a specific episode \n'
-        '2 - Update one or more series \n'
-    )
-    print(option)
-    if option == '2':
-        print('Pick one of these shows: \n')
-        dirlist = scan.scan_all('Z:\Series\\')
-        dirlist.sort()
-        i=1
         for dir in dirlist:
             print(str(i) + '. ' + dir)
             i += 1
@@ -108,15 +78,32 @@ def download_torrent(link,show):
         f.write(torrent_file)
         torrent_file = response.read(1024)
 
-main_menu = menu.Menu('Main',
+def set_current_menu(menu):
+    global current_menu
+    current_menu = menu
+
+test_menu = menu.Menu('Test',
                       [
-                          ('Download an episode', some_func()),
-                          ('Update one or more series', generate_series_list()),
-                          ('Exit', some_func())
+                          ('option 1', exit_func),
+                          ('option 2', exit_func),
                       ])
 
+main_menu = menu.Menu('Main',
+                      [
+                          ('Download an episode', test_menu),
+                          ('Update one or more series', generate_series_list),
+                          ('Exit', exit_func)
+                      ])
+
+
+
+
 def main():
-    print(main_menu)
+    set_current_menu(main_menu)
+    print(current_menu)
+    choice = input('>>')
+    current_menu.evaluate(choice)
+
   #  print_menu(main_menu)
     show = input('Which show?')
     print('Searching for ' + show)
