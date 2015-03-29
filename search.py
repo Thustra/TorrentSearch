@@ -11,20 +11,35 @@ base_url = 'http://www.extratorrent.cc/'
 
 user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
 headers = {'User-Agent': user_agent}
+library_root = 'Z:\Series\\'
 
-current_menu = None
 
-def exit_func():
-    sys.exit()
+def update_series(show):
+    print('Searching for ' + show)
+    result = search_show(show)
+    linklist = extract_links(result)
+    linklist.sort(key=lambda t: t[1],reverse=True)
+    download_torrent(linklist[0][0],show)
+    print("Thingy downloaded")
+    main_menu.set_previous(None)
+    return main_menu
 
+def update_all():
+    None
+
+def update_last_season():
+    None
 
 def generate_series_list():
-        dirlist = scan.scan_all('Z:\Series\\')
+        dirlist = scan.scan_all(library_root)
         dirlist.sort()
-        i = 1
+        series = []
         for dir in dirlist:
-            print(str(i) + '. ' + dir)
-            i += 1
+            series.append((dir, update_series, dir))
+
+        library_menu = menu.Menu('Library',series)
+        return library_menu
+
 
 
 def search_show(show):
@@ -78,39 +93,38 @@ def download_torrent(link,show):
         f.write(torrent_file)
         torrent_file = response.read(1024)
 
-def set_current_menu(menu):
-    global current_menu
-    current_menu = menu
 
 test_menu = menu.Menu('Test',
                       [
-                          ('option 1', exit_func),
-                          ('option 2', exit_func),
+                          ('option 1', generate_series_list),
+                          ('option 2', generate_series_list),
                       ])
 
 main_menu = menu.Menu('Main',
                       [
                           ('Download an episode', test_menu),
-                          ('Update one or more series', generate_series_list),
-                          ('Exit', exit_func)
+                          ('Update one or more series', generate_series_list)
                       ])
+
+update_menu = menu.Menu('What do you want to update?',
+                        [
+                            ('Last Season', update_last_season),
+                            ('All', update_all)
+                        ]
+                        )
 
 
 
 
 def main():
-    set_current_menu(main_menu)
-    print(current_menu)
-    choice = input('>>')
-    current_menu.evaluate(choice)
+    #current_menu = main_menu
+    #while True:
+     #   current_menu.show()
+     #   choice = input('>>')
+     #   current_menu = current_menu.evaluate(choice)
 
   #  print_menu(main_menu)
-    show = input('Which show?')
-    print('Searching for ' + show)
-    result = search_show(show)
-    linklist = extract_links(result)
-    linklist.sort(key=lambda t: t[1],reverse=True)
-    download_torrent(linklist[0][0],show)
+    print(scan.list_current_episodes('Castle',library_root))
 
 
 if __name__ == "__main__":
