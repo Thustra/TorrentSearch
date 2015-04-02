@@ -23,21 +23,6 @@ def scan_all_files(path):
     result = listdir(path)
     return [x for x in result if isfile(path+x)]
 
-# Finds all missing episodes for this series and returns
-# a list of episodes in the SxxEyy format
-def find_missing_episodes(show):
-    None
-
-def format_episode_number(season,episode):
-    result = None
-    return result
-
-# Find the latest aired episode
-
-def find_latest_episode_aired(show):
-    None
-
-
 # Returns an ordered list of all episodes we currently have
 def list_current_episodes(show, root):
     # Get all seasons we currently have folders for
