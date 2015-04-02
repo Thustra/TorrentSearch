@@ -42,7 +42,8 @@ def find_latest_episode_aired(show):
 def list_current_episodes(show, root):
     # Get all seasons we currently have folders for
     seasons = scan_all(root+show+'\\')
-    seasons.sort()
+    seasons.sort(key=lambda x: int(x[7:]))
+    print(seasons)
     #last_season = season.pop()
 
     all_season_episodes = []
