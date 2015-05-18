@@ -3,7 +3,7 @@ import urllib.parse
 import re
 from bs4 import BeautifulSoup
 
-import scan, rename
+import scan, rename_file
 
 
 base_url = 'http://www.extratorrent.cc/'
@@ -106,9 +106,9 @@ def main():
 
         print('last episode found:' + last_episode)
 
-        episode_number = rename.match_season_episode(last_episode)
+        episode_number = rename_file.match_season_episode(last_episode)
 
-        episode_number_tuple = rename.split_episode_number(episode_number)
+        episode_number_tuple = rename_file.split_episode_number(episode_number)
 
         download_next_episode(x,episode_number_tuple)
 
