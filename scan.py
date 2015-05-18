@@ -7,8 +7,6 @@ from os.path import isfile
 #
 # Scans a directory
 #
-
-
 def scan_directory(dir):
     None
 
