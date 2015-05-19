@@ -36,6 +36,9 @@ def rename_episodes(dir):
         new_name = rename_file.plexify_name(file)
         rename(dir+file,dir+new_name)
 
+def move_files_to_NAS():
+    None
+
 def main():
     #flatten_directory(ROOT_DIR)
     #filter_episodes(ROOT_DIR)

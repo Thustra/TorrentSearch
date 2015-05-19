@@ -7,7 +7,7 @@ import re
 #
 
 pattern1 = re.compile('[Ss]\\d+[Ee]\\d+')
-pattern2 = re.compile('[\.\-]\d{3,4}[\.\-]')
+pattern2 = re.compile('[\.\-]\d{3,4}')
 pattern3 = re.compile('\d{1,2}[Xx]\d{1,2}')
 
 def match_season_episode(filename):
@@ -27,11 +27,11 @@ def plexify_name(string):
     if pattern1.search(string):
         return string
     elif pattern2.search(string):
-        piece_to_change = pattern2.search(string)
+        piece_to_change = list(pattern2.finditer(string))[-1]
         endpos = piece_to_change.end()
         startpos = piece_to_change.start()
         #Cut out the piece to change
-        cut = string[startpos+1:endpos-1]
+        cut = string[startpos+1:endpos]
         if len(cut) == 4:
             cut = 'S'+cut[0:2] + 'E' + cut[2:4]
         if len(cut) == 3:
