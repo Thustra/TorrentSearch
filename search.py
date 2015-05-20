@@ -102,6 +102,7 @@ def main():
     # Get a list of the episodes we have for this show
     for x in series_to_watch:
         list_of_episodes = scan.list_current_episodes(x,library_root)
+        print(list_of_episodes)
         last_episode = list_of_episodes.pop()
 
         print('last episode found:' + last_episode)

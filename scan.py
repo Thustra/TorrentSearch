@@ -35,8 +35,8 @@ def list_current_episodes(show, root):
         season_episodes = scan_all_files(root+show+'\\'+season+'\\')
         if season_episodes.__contains__('Thumbs.db'):
             season_episodes.remove('Thumbs.db')
-        season_episodes.sort()
-        all_season_episodes.extend(season_episodes)
+        sorted_season_episodes = sorted(season_episodes, key=lambda s: s.lower())
+        all_season_episodes.extend(sorted_season_episodes)
     #last_episode= season_episodes.pop()
 
     return all_season_episodes

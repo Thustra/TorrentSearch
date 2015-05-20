@@ -47,13 +47,14 @@ def move_files_to_NAS():
         target_series_directory = rename_file.undot_file(max(match))
         season = rename_file.split_episode_number(rename_file.match_season_episode(episode))[0]
         season = str(season).lstrip('0')
-        print('copy ' + ROOT_SRC_DIR+episode + ' to '
-              + ROOT_TRG_DIR + target_series_directory + '\\' + 'Season ' + season + '\\' + episode)
-        #copy(ROOT_SRC_DIR+episode, ROOT_TRG_DIR + target_series_directory + '\\' + 'Season ' + season + '\\' + episode)
+        source =  ROOT_SRC_DIR+episode
+        target = ROOT_TRG_DIR + target_series_directory + '\\' + 'Season ' + season + '\\' + episode
+        print('copy ' + source + ' to ' + target)
+        copy(source, target)
 
 def main():
-    #flatten_directory(ROOT_DIR)
-    #filter_episodes(ROOT_DIR)
+    #flatten_directory(ROOT_SRC_DIR)
+    #filter_episodes(ROOT_SRC_DIR)
     #rename_episodes(ROOT_SRC_DIR)
     move_files_to_NAS()
 
