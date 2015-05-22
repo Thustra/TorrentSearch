@@ -16,7 +16,7 @@ watched_dir = 'E:\Watched\\'
 series_to_watch = ['Castle','2 Broke Girls', '12 Monkeys', 'Bones', 'Criminal Minds',
                    'Gotham', 'Marvels Agent Carter', 'Marvels Agents of SHIELD',
                    'Once Upon A time', 'Scorpion', 'The Big Bang theory',
-                   'The Flash (2014)', 'The Walking Dead', 'Glee']
+                   'The Flash (2014)', 'The Walking Dead', 'Glee', 'Penny Dreadful']
 #
 # Search for this show and return the html page
 #
@@ -81,15 +81,20 @@ def download_torrent(link,show):
         f.write(torrent_file)
         torrent_file = response.read(1024)
 
-
 def download_next_episode(show,current_episode):
-    if (int(current_episode[1]) < 9 ):
-        result_page = search_show(show+' S'+current_episode[0]+'E0'+str(int(current_episode[1])+1))
-    else:
-        result_page = search_show(show+' S'+current_episode[0]+'E'+str(int(current_episode[1])+1))
+
+    episode_number_int = int(current_episode[1])+1
+    episode_number = "%02d" % episode_number_int
+
+    season_number_int = int(current_episode[0])
+    season_number = "%02d" % season_number_int
+
+    result_page = search_show(show+' S'+ season_number +'E'+ episode_number)
+
     linklist = extract_links(result_page)
     #print(linklist)
     linklist.sort(key=lambda t: t[1],reverse=True)
+    #Search for next episode in this season
     if not find_text(result_page,'total 0 torrents found on your search query') and not linklist == []:
         link = linklist[0][0]
         download_torrent(link,show+' S'+current_episode[0]+'E'+str(int(current_episode[1])+1))
@@ -97,7 +102,6 @@ def download_next_episode(show,current_episode):
         download_next_episode(show,next_episode)
     else:
         print('done!')
-
 
 
 def main():
@@ -115,6 +119,10 @@ def main():
         episode_number_tuple = rename_file.split_episode_number(episode_number)
 
         download_next_episode(x,episode_number_tuple)
+
+        #Try next season
+
+        download_next_episode(x,(str(int(episode_number_tuple[0])+1),"0"))
 
 
 if __name__ == "__main__":
