@@ -26,8 +26,7 @@ def list_current_episodes(show, root):
     # Get all seasons we currently have folders for
     seasons = scan_all(root+show+'\\')
     seasons.sort(key=lambda x: int(x[7:]))
-    print(seasons)
-    #last_season = season.pop()
+    #print(seasons)
 
     all_season_episodes = []
 
@@ -37,6 +36,5 @@ def list_current_episodes(show, root):
             season_episodes.remove('Thumbs.db')
         sorted_season_episodes = sorted(season_episodes, key=lambda s: s.lower())
         all_season_episodes.extend(sorted_season_episodes)
-    #last_episode= season_episodes.pop()
 
     return all_season_episodes

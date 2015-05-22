@@ -83,9 +83,12 @@ def download_torrent(link,show):
 
 
 def download_next_episode(show,current_episode):
-    result_page = search_show(show+' S'+current_episode[0]+'E'+str(int(current_episode[1])+1))
+    if (int(current_episode[1]) < 9 ):
+        result_page = search_show(show+' S'+current_episode[0]+'E0'+str(int(current_episode[1])+1))
+    else:
+        result_page = search_show(show+' S'+current_episode[0]+'E'+str(int(current_episode[1])+1))
     linklist = extract_links(result_page)
-    print(linklist)
+    #print(linklist)
     linklist.sort(key=lambda t: t[1],reverse=True)
     if not find_text(result_page,'total 0 torrents found on your search query') and not linklist == []:
         link = linklist[0][0]
@@ -102,7 +105,7 @@ def main():
     # Get a list of the episodes we have for this show
     for x in series_to_watch:
         list_of_episodes = scan.list_current_episodes(x,library_root)
-        print(list_of_episodes)
+        #print(list_of_episodes)
         last_episode = list_of_episodes.pop()
 
         print('last episode found:' + last_episode)
