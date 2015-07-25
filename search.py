@@ -14,9 +14,8 @@ library_root = 'Z:\Series\\'
 watched_dir = 'E:\Watched\\'
 
 series_to_watch = ['Castle','2 Broke Girls', '12 Monkeys', 'Bones', 'Criminal Minds',
-                   'Gotham', 'Marvels Agent Carter', 'Marvels Agents of SHIELD',
-                   'Once Upon A time', 'Scorpion', 'The Big Bang theory',
-                   'The Flash (2014)', 'The Walking Dead', 'Glee', 'Penny Dreadful']
+                   'Gotham', 'Marvels Agent Carter', 'Marvels Agents of SHIELD', 'Scorpion', 'The Big Bang theory',
+                   'Game of Thrones', 'The Walking Dead', 'Glee', 'Penny Dreadful']
 #
 # Search for this show and return the html page
 #
@@ -33,6 +32,7 @@ def search_show(show):
 #
 # Extract the .torrent links we are interested in from the given
 # html page
+# Returns a tuple (link, seeders, leechers)
 #
 
 def extract_links(page):
@@ -81,6 +81,24 @@ def download_torrent(link,show):
         f.write(torrent_file)
         torrent_file = response.read(1024)
 
+#
+# Creates 3 lists respectively for 1080p, 720p and 'other'
+#
+
+def split_link_list(linklist):
+    linklist1080p = []
+    linklist720p = []
+    linklistOther = []
+    for item in linklist:
+        if '1080p' in item[0]:
+            linklist1080p.append(item)
+        elif '720p' in item[0]:
+            linklist720p.append(item)
+        else:
+            linklistOther.append(item)
+
+    return (linklist1080p,linklist720p,linklistOther)
+
 def download_next_episode(show,current_episode):
 
     episode_number_int = int(current_episode[1])+1
@@ -93,10 +111,21 @@ def download_next_episode(show,current_episode):
 
     linklist = extract_links(result_page)
     #print(linklist)
+
+
     linklist.sort(key=lambda t: t[1],reverse=True)
     #Search for next episode in this season
     if not find_text(result_page,'total 0 torrents found on your search query') and not linklist == []:
-        link = linklist[0][0]
+        quality_lists = split_link_list(linklist)
+#        if not quality_lists[0] == []:
+#            quality_lists[0].sort(key=lambda t: t[1],reverse=True)
+#            link = quality_lists[0][0][0]
+        if not quality_lists[1] == []:
+            quality_lists[1].sort(key=lambda t: t[1],reverse=True)
+            link = quality_lists[1][0][0]
+        else:
+            quality_lists[1].sort(key=lambda t: t[1],reverse=True)
+            link = quality_lists[2][0][0]
         download_torrent(link,show+' S'+current_episode[0]+'E'+str(int(current_episode[1])+1))
         next_episode = (current_episode[0],str(int(current_episode[1])+1))
         download_next_episode(show,next_episode)
