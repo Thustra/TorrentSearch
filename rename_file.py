@@ -42,4 +42,4 @@ def plexify_name(string):
             cut = 'S'+cut[0:2] + 'E' + cut[2:4]
         if len(cut) == 3:
             cut = 'S0'+cut[0:1] + 'E' + cut[1:3]
-        return string[0:startpos+1] + cut + string[endpos-1:]
+        return string[0:startpos+1] + cut + string[endpos:]

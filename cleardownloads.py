@@ -1,8 +1,8 @@
 __author__ = 'Peter'
 
 from shutil import copy,rmtree
-from os.path import getsize
-from os import remove,rename,chmod
+from os.path import getsize,exists
+from os import remove,rename,chmod,makedirs
 import stat
 
 import scan,rename_file
@@ -50,6 +50,11 @@ def rename_episodes(dir):
         new_name = rename_file.plexify_name(file)
         rename(dir+file,dir+new_name)
 
+def verify_target_dir(dir):
+    if not exists(dir):
+        makedirs(dir)
+
+
 def move_files_to_NAS():
     available_dirs = scan.scan_all(ROOT_TRG_DIR)
 
@@ -62,6 +67,7 @@ def move_files_to_NAS():
         season = str(season).lstrip('0')
         source =  ROOT_SRC_DIR+episode
         target = ROOT_TRG_DIR + target_series_directory + '\\' + 'Season ' + season + '\\' + episode
+        verify_target_dir(ROOT_TRG_DIR + target_series_directory + '\\' + 'Season ' + season + '\\')
         print('copy ' + source + ' to ' + target)
         copy(source, target)
 
