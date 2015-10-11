@@ -2,6 +2,7 @@ import urllib.request
 import urllib.parse
 import re
 from bs4 import BeautifulSoup
+from os import makedirs
 
 import scan, rename_file
 
@@ -15,7 +16,9 @@ watched_dir = 'E:\Watched\\'
 
 series_to_watch = ['Castle','2 Broke Girls', '12 Monkeys', 'Bones', 'Criminal Minds',
                    'Gotham', 'Marvels Agent Carter', 'Marvels Agents of SHIELD', 'Scorpion', 'The Big Bang theory',
-                   'Game of Thrones', 'The Walking Dead', 'Glee', 'Penny Dreadful']
+                   'Game of Thrones', 'The Walking Dead', 'Glee', 'Penny Dreadful','Mr Robot']
+
+#series_to_watch = ['Mr. Robot']
 #
 # Search for this show and return the html page
 #
@@ -117,9 +120,7 @@ def download_next_episode(show,current_episode):
     #Search for next episode in this season
     if not find_text(result_page,'total 0 torrents found on your search query') and not linklist == []:
         quality_lists = split_link_list(linklist)
-#        if not quality_lists[0] == []:
-#            quality_lists[0].sort(key=lambda t: t[1],reverse=True)
-#            link = quality_lists[0][0][0]
+
         if not quality_lists[1] == []:
             quality_lists[1].sort(key=lambda t: t[1],reverse=True)
             link = quality_lists[1][0][0]
@@ -137,20 +138,21 @@ def main():
 
     # Get a list of the episodes we have for this show
     for x in series_to_watch:
-        list_of_episodes = scan.list_current_episodes(x,library_root)
-        #print(list_of_episodes)
-        last_episode = list_of_episodes.pop()
+        try:
+            list_of_episodes = scan.list_current_episodes(x,library_root)
+            last_episode = list_of_episodes.pop()
+            print('last episode found:' + last_episode)
+            episode_number = rename_file.match_season_episode(last_episode)
+            episode_number_tuple = rename_file.split_episode_number(episode_number)
+            download_next_episode(x,episode_number_tuple)
 
-        print('last episode found:' + last_episode)
-
-        episode_number = rename_file.match_season_episode(last_episode)
-
-        episode_number_tuple = rename_file.split_episode_number(episode_number)
-
-        download_next_episode(x,episode_number_tuple)
+        except FileNotFoundError:
+            # File doesn't exist so we create the directory
+            makedirs(library_root+x)
+            # Download starting from season one, episode one.
+            download_next_episode(x,("1","0"))
 
         #Try next season
-
         download_next_episode(x,(str(int(episode_number_tuple[0])+1),"0"))
 
 
