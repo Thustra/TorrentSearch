@@ -15,8 +15,8 @@ library_root = 'Z:\Series\\'
 watched_dir = 'E:\Watched\\'
 
 series_to_watch = ['Castle','2 Broke Girls', '12 Monkeys', 'Bones', 'Criminal Minds',
-                   'Gotham', 'Marvels Agent Carter', 'Marvels Agents of SHIELD', 'Scorpion', 'The Big Bang theory',
-                   'Game of Thrones', 'The Walking Dead', 'Glee', 'Penny Dreadful','Mr Robot']
+                   'Gotham', 'Marvels Agent Carter', 'Marvels Agents of S.H.I.E.L.D', 'Scorpion', 'The Big Bang theory',
+                   'Game of Thrones', 'The Walking Dead', 'Glee', 'Penny Dreadful','Mr. Robot']
 
 #series_to_watch = ['Mr. Robot']
 #

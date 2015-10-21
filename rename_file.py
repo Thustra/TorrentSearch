@@ -23,6 +23,7 @@ def match_default_pattern(string):
     return default_pattern.search(string)
 
 def add_dots_remove_years(string):
+    string = string.replace('. ', '.')
     return re.sub(r'.[(]\d{4}[)]','',string.replace(' ','.'))
 
 def undot_file(string):

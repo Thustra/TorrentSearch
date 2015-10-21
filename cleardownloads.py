@@ -21,18 +21,22 @@ def flatten_directory(dir):
     dirlist = scan.scan_all(dir)
     print("Dirlist")
     print(dirlist)
-    for dir in dirlist:
-        flatten_directory(root_path+dir+'\\')
-        print("Removing: " + root_path+dir)
-        rmtree(root_path+dir, onerror=remove_readonly)
+    while dirlist:
+        flatten_directory(root_path+dirlist.pop(0)+'\\')
+    #for dir in dirlist:
+    #    flatten_directory(root_path+dir+'\\')
     if dirlist == []:
         filelist = scan.scan_all_files(dir)
         print("Filelist")
         print(filelist)
         for file in filelist:
-            print('Copying file from ' + dir+file + ' to ' + ROOT_SRC_DIR+file)
             if not (dir+file == ROOT_SRC_DIR+file):
+                print('Copying file from ' + dir+file + ' to ' + ROOT_SRC_DIR+file)
                 copy(dir+file,ROOT_SRC_DIR+file)
+        if ( root_path != ROOT_SRC_DIR):
+            print("Removing: " + root_path)
+            rmtree(root_path, onerror=remove_readonly)
+
 
 # Keep all files over 100MB in size
 
@@ -44,10 +48,28 @@ def filter_episodes(dir):
             chmod(absolute_file_path, stat.S_IWRITE)
             remove(absolute_file_path)
 
+def create_dir_dict():
+    #Get all directories on the NAS root folder
+    series_dirs = scan.scan_all(ROOT_TRG_DIR)
+
+    #Add dots and remove spaces
+    # Game of Thrones ==> Game.of.Thrones
+    # Agents of S.H.I.E.L.D ==> Agents.of.S.H.I.E.L.D
+    # Mr. Robot ==> Mr.Robot
+    dotted_dirs = [rename_file.add_dots_remove_years(dir) for dir in series_dirs]
+    series_dict = dict(zip(dotted_dirs,series_dirs))
+
+    return series_dict
+
+
+
+
+
 def rename_episodes(dir):
     filelist = scan.scan_all_files(dir)
     for file in filelist:
         new_name = rename_file.plexify_name(file)
+        print("new name: " + new_name)
         rename(dir+file,dir+new_name)
 
 def verify_target_dir(dir):
@@ -56,13 +78,15 @@ def verify_target_dir(dir):
 
 
 def move_files_to_NAS():
-    available_dirs = scan.scan_all(ROOT_TRG_DIR)
+    series = create_dir_dict()
 
     files_to_move = scan.scan_all_files(ROOT_SRC_DIR)
-    dotted_dirs = [rename_file.add_dots_remove_years(dir) for dir in available_dirs]
+    #dotted_dirs = [rename_file.add_dots_remove_years(dir) for dir in available_dirs]
+
     for episode in files_to_move:
-        match = [dir for dir in dotted_dirs if (episode.lower()).startswith(dir.lower())]
-        target_series_directory = rename_file.undot_file(max(match))
+        match = [dir for dir in series if (episode.lower()).startswith(dir.lower())]
+        #target_series_directory = rename_file.undot_file(max(match))
+        target_series_directory = series[match[0]]
         season = rename_file.split_episode_number(rename_file.match_season_episode(episode))[0]
         season = str(season).lstrip('0')
         source =  ROOT_SRC_DIR+episode
@@ -70,13 +94,13 @@ def move_files_to_NAS():
         verify_target_dir(ROOT_TRG_DIR + target_series_directory + '\\' + 'Season ' + season + '\\')
         print('copy ' + source + ' to ' + target)
         copy(source, target)
+        remove(source)
 
 def main():
     flatten_directory(ROOT_SRC_DIR)
     filter_episodes(ROOT_SRC_DIR)
     rename_episodes(ROOT_SRC_DIR)
     move_files_to_NAS()
-
 
 
 if __name__ == "__main__":
