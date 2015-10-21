@@ -81,19 +81,18 @@ def move_files_to_NAS():
     series = create_dir_dict()
 
     files_to_move = scan.scan_all_files(ROOT_SRC_DIR)
-    #dotted_dirs = [rename_file.add_dots_remove_years(dir) for dir in available_dirs]
 
     for episode in files_to_move:
-        match = [dir for dir in series if (episode.lower()).startswith(dir.lower())]
-        #target_series_directory = rename_file.undot_file(max(match))
-        target_series_directory = series[match[0]]
-        season = rename_file.split_episode_number(rename_file.match_season_episode(episode))[0]
-        season = str(season).lstrip('0')
         source =  ROOT_SRC_DIR+episode
-        target = ROOT_TRG_DIR + target_series_directory + '\\' + 'Season ' + season + '\\' + episode
-        verify_target_dir(ROOT_TRG_DIR + target_series_directory + '\\' + 'Season ' + season + '\\')
-        print('copy ' + source + ' to ' + target)
-        copy(source, target)
+        match = [dir for dir in series if (episode.lower()).startswith(dir.lower())]
+        if match:
+            target_series_directory = series[match[0]]
+            season = rename_file.split_episode_number(rename_file.match_season_episode(episode))[0]
+            season = str(season).lstrip('0')
+            target = ROOT_TRG_DIR + target_series_directory + '\\' + 'Season ' + season + '\\' + episode
+            verify_target_dir(ROOT_TRG_DIR + target_series_directory + '\\' + 'Season ' + season + '\\')
+            print('copy ' + source + ' to ' + target)
+            copy(source, target)
         remove(source)
 
 def main():
