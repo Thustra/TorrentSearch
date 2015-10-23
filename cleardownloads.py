@@ -4,6 +4,7 @@ from shutil import copy,rmtree
 from os.path import getsize,exists
 from os import remove,rename,chmod,makedirs
 import stat
+import logging
 
 import scan,rename_file
 
@@ -17,24 +18,19 @@ def remove_readonly(func, path, excinfo):
 
 def flatten_directory(dir):
     root_path=dir
-    print("root path is " + root_path)
     dirlist = scan.scan_all(dir)
-    print("Dirlist")
-    print(dirlist)
     while dirlist:
         flatten_directory(root_path+dirlist.pop(0)+'\\')
     #for dir in dirlist:
     #    flatten_directory(root_path+dir+'\\')
     if dirlist == []:
         filelist = scan.scan_all_files(dir)
-        print("Filelist")
-        print(filelist)
         for file in filelist:
             if not (dir+file == ROOT_SRC_DIR+file):
-                print('Copying file from ' + dir+file + ' to ' + ROOT_SRC_DIR+file)
+                logging.info('Copying file from ' + dir+file + ' to ' + ROOT_SRC_DIR+file)
                 copy(dir+file,ROOT_SRC_DIR+file)
         if ( root_path != ROOT_SRC_DIR):
-            print("Removing: " + root_path)
+            logging.info("Removing: " + root_path)
             rmtree(root_path, onerror=remove_readonly)
 
 
@@ -69,18 +65,27 @@ def rename_episodes(dir):
     filelist = scan.scan_all_files(dir)
     for file in filelist:
         new_name = rename_file.plexify_name(file)
-        print("new name: " + new_name)
         rename(dir+file,dir+new_name)
 
 def verify_target_dir(dir):
     if not exists(dir):
         makedirs(dir)
 
+def export_blacklist(blacklist):
+    blacklistfile = open("blacklist.txt",'a')
+    for item in blacklist:
+        blacklistfile.write(item)
+    blacklistfile.close()
+
 
 def move_files_to_NAS():
+
+    logging.info("Moving files to NAS")
     series = create_dir_dict()
 
     files_to_move = scan.scan_all_files(ROOT_SRC_DIR)
+
+    blacklist = []
 
     for episode in files_to_move:
         source =  ROOT_SRC_DIR+episode
@@ -91,11 +96,17 @@ def move_files_to_NAS():
             season = str(season).lstrip('0')
             target = ROOT_TRG_DIR + target_series_directory + '\\' + 'Season ' + season + '\\' + episode
             verify_target_dir(ROOT_TRG_DIR + target_series_directory + '\\' + 'Season ' + season + '\\')
-            print('copy ' + source + ' to ' + target)
+            logging.info('Copying ' + source + ' to ' + target)
             copy(source, target)
+        else:
+            logging.warning(match + " should not have been downloaded. Added to blacklist.")
+            blacklist.append(match)
         remove(source)
 
+    export_blacklist(blacklist)
+
 def main():
+    logging.info("Starting to clear downloads.")
     flatten_directory(ROOT_SRC_DIR)
     filter_episodes(ROOT_SRC_DIR)
     rename_episodes(ROOT_SRC_DIR)

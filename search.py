@@ -1,6 +1,7 @@
 import urllib.request
 import urllib.parse
 import re
+import logging
 from bs4 import BeautifulSoup
 from os import makedirs
 
@@ -24,7 +25,7 @@ series_to_watch = ['Castle','2 Broke Girls', '12 Monkeys', 'Bones', 'Criminal Mi
 #
 
 def search_show(show):
-    print(show)
+    logging.info("Searching for " + show)
     show = urllib.parse.quote_plus(show)
     url = base_url + '/search/?new=1&search='+show+'&s_cat=8'
     req = urllib.request.Request(url,headers=headers)
@@ -48,11 +49,11 @@ def extract_links(page):
         #
         relative_link_to_torrent = row.td.a.get('href')
         link_to_torrent = base_url + relative_link_to_torrent[9:]
-        #download_torrent(link_to_torrent)
-
         #
         # Find out how many seeders/leechers each torrent has
         #
+
+        discard = 0
 
         try:
             seeders = int(row.find('td', {'class': 'sy'} ).string)
@@ -65,7 +66,9 @@ def extract_links(page):
 
         except AttributeError:
             # No seeders/leechers --> discard
-            print('Oops, no seeders or leechers found!')
+            discard = discard + 1
+
+        logging.warning(discard + " links discarded for lack of seeders/leechers.")
 
     return links
 
@@ -75,7 +78,6 @@ def find_text(page,text_to_match):
 
 
 def download_torrent(link,show):
-    print(link)
     req = urllib.request.Request(link,headers=headers)
     response = urllib.request.urlopen(req)
     f = open(watched_dir+show+'.torrent', 'wb')
@@ -83,6 +85,7 @@ def download_torrent(link,show):
     while torrent_file:
         f.write(torrent_file)
         torrent_file = response.read(1024)
+    logging.info(show + " downloaded from " + link)
 
 #
 # Creates 3 lists respectively for 1080p, 720p and 'other'
@@ -113,7 +116,6 @@ def download_next_episode(show,current_episode):
     result_page = search_show(show+' S'+ season_number +'E'+ episode_number)
 
     linklist = extract_links(result_page)
-    #print(linklist)
 
 
     linklist.sort(key=lambda t: t[1],reverse=True)
@@ -131,22 +133,25 @@ def download_next_episode(show,current_episode):
         next_episode = (current_episode[0],str(int(current_episode[1])+1))
         download_next_episode(show,next_episode)
     else:
-        print('done!')
+        logging.info("No more new episodes!")
 
 
 def main():
+
+    logging.info("Starting to search for new episodes.")
 
     # Get a list of the episodes we have for this show
     for x in series_to_watch:
         try:
             list_of_episodes = scan.list_current_episodes(x,library_root)
             last_episode = list_of_episodes.pop()
-            print('last episode found:' + last_episode)
+            logging.info("Starting from " + last_episode)
             episode_number = rename_file.match_season_episode(last_episode)
             episode_number_tuple = rename_file.split_episode_number(episode_number)
             download_next_episode(x,episode_number_tuple)
 
         except FileNotFoundError:
+            logging.warning("Series not found, new directory created for " + x)
             # File doesn't exist so we create the directory
             makedirs(library_root+x)
             # Download starting from season one, episode one.
