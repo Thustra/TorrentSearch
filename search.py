@@ -68,7 +68,7 @@ def extract_links(page):
             # No seeders/leechers --> discard
             discard = discard + 1
 
-        logging.warning(discard + " links discarded for lack of seeders/leechers.")
+        logging.warning(str(discard) + " links discarded for lack of seeders/leechers.")
 
     return links
 
@@ -105,6 +105,14 @@ def split_link_list(linklist):
 
     return (linklist1080p,linklist720p,linklistOther)
 
+def check_blacklist(link):
+    linkparts = link.split("/")
+    if linkparts.pop().replace("+",".")[:-7] in open("blacklist.txt").read():
+        logging.warning("Blacklisted file from " + link + " not downloaded!")
+        return False
+    else:
+        return True
+
 def download_next_episode(show,current_episode):
 
     episode_number_int = int(current_episode[1])+1
@@ -129,15 +137,16 @@ def download_next_episode(show,current_episode):
         else:
             quality_lists[1].sort(key=lambda t: t[1],reverse=True)
             link = quality_lists[2][0][0]
-        download_torrent(link,show+' S'+current_episode[0]+'E'+str(int(current_episode[1])+1))
-        next_episode = (current_episode[0],str(int(current_episode[1])+1))
-        download_next_episode(show,next_episode)
+        if check_blacklist(link):
+            download_torrent(link,show+' S'+current_episode[0]+'E'+str(int(current_episode[1])+1))
+            next_episode = (current_episode[0],str(int(current_episode[1])+1))
+            download_next_episode(show,next_episode)
     else:
         logging.info("No more new episodes!")
 
 
 def main():
-
+    logging.getLogger('torrenter')
     logging.info("Starting to search for new episodes.")
 
     # Get a list of the episodes we have for this show

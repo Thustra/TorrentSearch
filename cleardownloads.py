@@ -99,8 +99,8 @@ def move_files_to_NAS():
             logging.info('Copying ' + source + ' to ' + target)
             copy(source, target)
         else:
-            logging.warning(match + " should not have been downloaded. Added to blacklist.")
-            blacklist.append(match)
+            logging.warning(episode + " should not have been downloaded. Added to blacklist.")
+            blacklist.append(episode)
         remove(source)
 
     export_blacklist(blacklist)
