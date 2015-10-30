@@ -2,7 +2,7 @@ __author__ = 'Peter'
 
 
 import subprocess, search, cleardownloads
-import logging
+import logging, urllib,sys
 
 
 logging.getLogger('torrenter')
@@ -11,7 +11,11 @@ logging.basicConfig(filename='example.log',level=logging.DEBUG, format='%(asctim
 
 def main():
     logging.info("Starting search.py")
-    search.main()
+    try:
+        search.main()
+    except urllib.error.HTTPError:
+        sys.exit("Failure to connect")
+
 
     logging.info("Starting torrent client")
     subprocess.call("C:\Program Files (x86)\qBittorrent\qbittorrent.exe")

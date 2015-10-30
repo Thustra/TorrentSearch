@@ -10,6 +10,8 @@ import scan, rename_file
 
 base_url = 'http://www.extratorrent.cc/'
 
+sites = ['http://www.extratorrent.cc/', 'http://1337x.to']
+
 user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
 headers = {'User-Agent': user_agent}
 library_root = 'Z:\Series\\'
@@ -32,6 +34,7 @@ def search_show(show):
     response = urllib.request.urlopen(req)
     htmlpage = response.read()
     return htmlpage
+
 
 #
 # Extract the .torrent links we are interested in from the given
@@ -122,8 +125,8 @@ def download_next_episode(show,current_episode):
     season_number = "%02d" % season_number_int
 
     result_page = search_show(show+' S'+ season_number +'E'+ episode_number)
-
     linklist = extract_links(result_page)
+
 
 
     linklist.sort(key=lambda t: t[1],reverse=True)
@@ -152,23 +155,26 @@ def main():
     # Get a list of the episodes we have for this show
     for x in series_to_watch:
         try:
-            list_of_episodes = scan.list_current_episodes(x,library_root)
-            last_episode = list_of_episodes.pop()
-            logging.info("Starting from " + last_episode)
-            episode_number = rename_file.match_season_episode(last_episode)
-            episode_number_tuple = rename_file.split_episode_number(episode_number)
-            download_next_episode(x,episode_number_tuple)
+            try:
+                list_of_episodes = scan.list_current_episodes(x,library_root)
+                last_episode = list_of_episodes.pop()
+                logging.info("Starting from " + last_episode)
+                episode_number = rename_file.match_season_episode(last_episode)
+                episode_number_tuple = rename_file.split_episode_number(episode_number)
+                download_next_episode(x,episode_number_tuple)
 
-        except FileNotFoundError:
-            logging.warning("Series not found, new directory created for " + x)
-            # File doesn't exist so we create the directory
-            makedirs(library_root+x)
-            # Download starting from season one, episode one.
-            download_next_episode(x,("1","0"))
+            except FileNotFoundError:
+                logging.warning("Series not found, new directory created for " + x)
+                # File doesn't exist so we create the directory
+                makedirs(library_root+x)
+                # Download starting from season one, episode one.
+                download_next_episode(x,("1","0"))
 
-        #Try next season
-        download_next_episode(x,(str(int(episode_number_tuple[0])+1),"0"))
-
+            #Try next season
+            download_next_episode(x,(str(int(episode_number_tuple[0])+1),"0"))
+        except urllib.error.HTTPError:
+            logging.error("Couldn't connect to website")
+            raise
 
 if __name__ == "__main__":
     main()
