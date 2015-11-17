@@ -16,10 +16,11 @@ user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
 headers = {'User-Agent': user_agent}
 library_root = 'Z:\Series\\'
 watched_dir = 'E:\Watched\\'
+files_downloaded=False
 
 series_to_watch = ['Castle','2 Broke Girls', '12 Monkeys', 'Bones', 'Criminal Minds',
                    'Gotham', 'Marvels Agent Carter', 'Marvels Agents of S.H.I.E.L.D', 'Scorpion', 'The Big Bang theory',
-                   'Game of Thrones', 'The Walking Dead','Mr. Robot','Doctor Who']
+                   'Game of Thrones', 'The Walking Dead','Mr. Robot', 'Downton Abbey']
 
 #series_to_watch = ['Mr. Robot']
 #
@@ -89,6 +90,8 @@ def download_torrent(link,show):
         f.write(torrent_file)
         torrent_file = response.read(1024)
     logging.info(show + " downloaded from " + link)
+    global files_downloaded
+    files_downloaded=True
 
 #
 # Creates 3 lists respectively for 1080p, 720p and 'other'
@@ -175,6 +178,7 @@ def main():
         except urllib.error.HTTPError:
             logging.error("Couldn't connect to website")
             raise
+
 
 if __name__ == "__main__":
     main()

@@ -16,12 +16,13 @@ def main():
     except urllib.error.HTTPError:
         sys.exit("Failure to connect")
 
+    ## If torrents are present start the client
+    if search.files_downloaded:
+        logging.info("Starting torrent client")
+        subprocess.call("C:\Program Files (x86)\qBittorrent\qbittorrent.exe")
 
-    logging.info("Starting torrent client")
-    subprocess.call("C:\Program Files (x86)\qBittorrent\qbittorrent.exe")
-
-    logging.info("Starting cleardownloads.py")
-    cleardownloads.main()
+        logging.info("Starting cleardownloads.py")
+        cleardownloads.main()
 
     logging.info("DONE!")
 
