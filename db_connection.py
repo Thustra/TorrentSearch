@@ -21,19 +21,15 @@ Shows = Base.classes.shows
 
 Session = sessionmaker(bind=engine)
 
-print(os.environ['DATABASE_URL'])
-
 def get_downloads():
     session = Session()
     for instance in session.query(Downloads).all():
         print(instance.filename)
 
-def get_series():
-    connection = engine.connect()
-    result = connection.execute("select * from shows")
-    for row in result:
-        print(str(row[0]) + " " + str(row[1]) + " " + str(row[2]))
-    connection.close()
+def get_series(watching=True,finished=False):
+    session = Session()
+    return session.query(Shows).filter_by(watching=watching).all()
+
 
 def get_downloads(series):
     session = Session()
@@ -59,13 +55,8 @@ def add_download(filename,size,location,season,show):
     session.add(entry)
     session.commit()
 
-def add_show(name, finished):
+def add_show(name, watching, finished):
     session = Session()
-    entry = Shows(title=name, finished=finished)
+    entry = Shows(title=name, watching=watching, finished=finished)
     session.add(entry)
     session.commit()
-
-
-get_downloads('Gotham')
-
-add_download('file.avi', 123456,'c:\\herp\derp\merp', 5, 'Firefly')

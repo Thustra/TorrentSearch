@@ -5,7 +5,7 @@ import logging
 from bs4 import BeautifulSoup
 from os import makedirs
 
-import scan, rename_file
+import scan, rename_file, db_connection
 
 
 base_url = 'http://www.extratorrent.cc/'
@@ -16,13 +16,14 @@ user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
 headers = {'User-Agent': user_agent}
 library_root = 'Z:\Series\\'
 watched_dir = 'E:\Watched\\'
-files_downloaded=False
+files_downloaded = False
 
-series_to_watch = ['Castle','2 Broke Girls', '12 Monkeys', 'Bones', 'Criminal Minds',
-                   'Gotham', 'Marvels Agent Carter', 'Marvels Agents of S.H.I.E.L.D', 'Scorpion', 'The Big Bang theory',
-                   'Game of Thrones', 'The Walking Dead','Mr. Robot', 'Downton Abbey']
 
-#series_to_watch = ['Mr. Robot']
+def get_series_to_watch():
+    result = db_connection.get_series(watching=True)
+    return [item.title for item in result ]
+
+
 #
 # Search for this show and return the html page
 #
@@ -71,8 +72,6 @@ def extract_links(page):
         except AttributeError:
             # No seeders/leechers --> discard
             discard = discard + 1
-
-        logging.warning(str(discard) + " links discarded for lack of seeders/leechers.")
 
     return links
 
@@ -130,10 +129,8 @@ def download_next_episode(show,current_episode):
     result_page = search_show(show+' S'+ season_number +'E'+ episode_number)
     linklist = extract_links(result_page)
 
-
-
     linklist.sort(key=lambda t: t[1],reverse=True)
-    #Search for next episode in this season
+    # Search for next episode in this season
     if not find_text(result_page,'total 0 torrents found on your search query') and not linklist == []:
         quality_lists = split_link_list(linklist)
 
@@ -155,6 +152,7 @@ def main():
     logging.getLogger('torrenter')
     logging.info("Starting to search for new episodes.")
 
+    series_to_watch = get_series_to_watch()
     # Get a list of the episodes we have for this show
     for x in series_to_watch:
         try:
@@ -173,7 +171,7 @@ def main():
                 # Download starting from season one, episode one.
                 download_next_episode(x,("1","0"))
 
-            #Try next season
+            # Try next season
             download_next_episode(x,(str(int(episode_number_tuple[0])+1),"0"))
         except urllib.error.HTTPError:
             logging.error("Couldn't connect to website")

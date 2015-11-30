@@ -21,8 +21,8 @@ def main():
         logging.info("Starting torrent client")
         subprocess.call("C:\Program Files (x86)\qBittorrent\qbittorrent.exe")
 
-        logging.info("Starting cleardownloads.py")
-        cleardownloads.main()
+    logging.info("Starting cleardownloads.py")
+    cleardownloads.main()
 
     logging.info("DONE!")
 
