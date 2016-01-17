@@ -75,6 +75,7 @@ def extract_links(page):
 
     return links
 
+
 def find_text(page,text_to_match):
     soup = BeautifulSoup(page)
     return text_to_match in soup.get_text()
@@ -92,10 +93,10 @@ def download_torrent(link,show):
     global files_downloaded
     files_downloaded=True
 
+
 #
 # Creates 3 lists respectively for 1080p, 720p and 'other'
 #
-
 def split_link_list(linklist):
     linklist1080p = []
     linklist720p = []
@@ -110,6 +111,7 @@ def split_link_list(linklist):
 
     return (linklist1080p,linklist720p,linklistOther)
 
+
 def check_blacklist(link):
     linkparts = link.split("/")
     if linkparts.pop().replace("+",".")[:-7] in open("blacklist.txt").read():
@@ -117,6 +119,7 @@ def check_blacklist(link):
         return False
     else:
         return True
+
 
 def download_next_episode(show,current_episode):
 
@@ -158,11 +161,14 @@ def main():
         try:
             try:
                 list_of_episodes = scan.list_current_episodes(x,library_root)
-                last_episode = list_of_episodes.pop()
-                logging.info("Starting from " + last_episode)
-                episode_number = rename_file.match_season_episode(last_episode)
-                episode_number_tuple = rename_file.split_episode_number(episode_number)
-                download_next_episode(x,episode_number_tuple)
+                if not list_of_episodes:
+                    download_next_episode(x,("1","0"))
+                else:
+                    last_episode = list_of_episodes.pop()
+                    logging.info("Starting from " + last_episode)
+                    episode_number = rename_file.match_season_episode(last_episode)
+                    episode_number_tuple = rename_file.split_episode_number(episode_number)
+                    download_next_episode(x,episode_number_tuple)
 
             except FileNotFoundError:
                 logging.warning("Series not found, new directory created for " + x)

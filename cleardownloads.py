@@ -2,7 +2,7 @@ __author__ = 'Peter'
 
 from shutil import copy, rmtree
 from os.path import getsize, exists
-from os import remove, rename, chmod, makedirs
+import os
 import stat
 import logging
 
@@ -14,24 +14,16 @@ ROOT_TRG_DIR = 'Z:\Series\\'
 
 
 def remove_readonly(func, path,):
-    chmod(path, stat.S_IWRITE)
+    os.chmod(path, stat.S_IWRITE)
     func(path)
 
 
 def flatten_directory(dir):
-    root_path = dir
-    dirlist = scan.scan_all(dir)
-    while dirlist:
-        flatten_directory(root_path+dirlist.pop(0)+'\\')
-    if not dirlist:
-        filelist = scan.scan_all_files(dir)
-        for file in filelist:
-            if not (dir+file == ROOT_SRC_DIR+file):
-                logging.info('Copying file from ' + dir + file + ' to ' + ROOT_SRC_DIR+file)
-                copy(dir+file, ROOT_SRC_DIR+file)
-        if root_path != ROOT_SRC_DIR:
-            logging.info("Removing: " + root_path)
-            rmtree(root_path, onerror=remove_readonly)
+    for d, dirs, files in os.walk(dir):
+        if d is not dir:
+            for f in files:
+                copy(os.path.join(d, f), os.path.join(dir,f))
+            rmtree(d, onerror=remove_readonly)
 
 
 # Keep all files over 100MB in size
@@ -41,8 +33,8 @@ def filter_episodes(dir):
     for file in filelist:
         absolute_file_path = dir+file
         if getsize(absolute_file_path) < 102400000:
-            chmod(absolute_file_path, stat.S_IWRITE)
-            remove(absolute_file_path)
+            os.chmod(absolute_file_path, stat.S_IWRITE)
+            os.remove(absolute_file_path)
 
 
 def create_dir_dict():
@@ -63,12 +55,12 @@ def rename_episodes(dir):
     filelist = scan.scan_all_files(dir)
     for file in filelist:
         new_name = rename_file.plexify_name(file)
-        rename(dir+file, dir+new_name)
+        os.rename(dir+file, dir+new_name)
 
 
 def verify_target_dir(dir):
     if not exists(dir):
-        makedirs(dir)
+        os.makedirs(dir)
 
 
 def export_blacklist(blacklist):
@@ -108,7 +100,7 @@ def move_files_to_NAS():
         else:
             logging.warning(episode + " should not have been downloaded. Added to blacklist.")
             blacklist.append(episode)
-        remove(source)
+        os.remove(source)
 
     export_blacklist(blacklist)
 

@@ -55,8 +55,8 @@ def add_download(filename,size,location,season,show):
     session.add(entry)
     session.commit()
 
-def add_show(name, watching, finished):
+def add_show(name, watching, finished,tvmaze_id):
     session = Session()
-    entry = Shows(title=name, watching=watching, finished=finished)
+    entry = Shows(title=name, watching=watching, finished=finished,tvmaze_id=tvmaze_id)
     session.add(entry)
     session.commit()
