@@ -14,7 +14,7 @@ def main():
     try:
         search.main()
     except urllib.error.HTTPError:
-        sys.exit("Failure to connect")
+        logging.info("Failure to connect, proceeding with script")
 
     ## If torrents are present start the client
     if search.files_downloaded:
