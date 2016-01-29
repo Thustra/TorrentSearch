@@ -36,6 +36,7 @@ def get_downloads(series):
     for result in session.query(Shows).filter_by(title=series).all():
         print(result.id)
 
+
 def get_show_id(series):
     session = Session()
     for result in session.query(Shows).filter_by(title=series).all():

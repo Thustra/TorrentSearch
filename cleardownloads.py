@@ -41,11 +41,11 @@ def create_dir_dict():
     # Get all directories on the NAS root folder
     series_dirs = scan.scan_all(ROOT_TRG_DIR)
 
-    # Add dots and remove spaces
+    # Add dots and remove spaces and apostrophes
     # Game of Thrones ==> Game.of.Thrones
     # Agents of S.H.I.E.L.D ==> Agents.of.S.H.I.E.L.D
     # Mr. Robot ==> Mr.Robot
-    dotted_dirs = [rename_file.add_dots_remove_years(dir) for dir in series_dirs]
+    dotted_dirs = [rename_file.add_dots_remove_years(dir).replace("'", "") for dir in series_dirs]
     series_dict = dict(zip(dotted_dirs, series_dirs))
 
     return series_dict
@@ -78,7 +78,7 @@ def move_files_to_NAS():
 
     logging.info("Moving files to NAS")
     series = create_dir_dict()
-
+    print(series)
     files_to_move = scan.scan_all_files(ROOT_SRC_DIR)
 
     blacklist = []
